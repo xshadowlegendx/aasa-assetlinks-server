@@ -16,6 +16,7 @@ defmodule AasaAssetlinksServer.Application do
           [name: AasaAssetlinksServer.ClusterSupervisor]
         ]
       },
+      AasaAssetlinksServer.InmemStore,
       {Bandit, plug: AasaAssetlinksServer.Router, scheme: :http, port: 4000}
     ]
 
