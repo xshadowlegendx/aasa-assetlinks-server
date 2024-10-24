@@ -9,9 +9,15 @@ defmodule AasaAssetlinksServer.Assetlinks do
   plug :dispatch
 
   put "/" do
-    :ok = InmemStore.set_assetlinks_app(conn.body_params["app_id"], conn.body_params)
+    case InmemStore.set_assetlinks_app(conn.body_params["app_id"], conn.body_params) do
+      :ok ->
+        send_resp(conn, 204, "")
 
-    send_resp(conn, 204, "")
+      {:error, {:wrong_format, "" <> message, _context}} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(400, :json.encode(%{code: nil, message: message}))
+    end
   end
 
   delete "/" do

@@ -5,6 +5,8 @@ defmodule AasaAssetlinksServer.InmemStore do
 
   require Logger
 
+  alias AasaAssetlinksServer.AasaAssetlinksApp
+
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, nil, name: {:global, __MODULE__})
   end
@@ -45,14 +47,6 @@ defmodule AasaAssetlinksServer.InmemStore do
     }
   end
 
-  defp derive_assetlinks_namespace(app_id) do
-    if String.match?(app_id, ~r/^https?:\/\//) do
-      "web"
-    else
-      "android_app"
-    end
-  end
-
   def get_app(app, app_id) do
     ets_key =
       case app do
@@ -91,7 +85,7 @@ defmodule AasaAssetlinksServer.InmemStore do
   defp ensure_assetlinks_app({_, app}), do: app
 
   defp set_namespace(app, app_id),
-    do: %{app | "namespace" => derive_assetlinks_namespace(app_id)}
+    do: %{app | "namespace" => AasaAssetlinksApp.derive_assetlinks_namespace(app_id)}
 
   defp update_relation(app, %{"relation" => [_|_] = relations}),
     do: %{app | "relation" => relations}
@@ -114,12 +108,18 @@ defmodule AasaAssetlinksServer.InmemStore do
       |> update_applink(config)
       |> update_aasa_webcredential(config)
 
-    :ets.insert(
-      :aasa_assetlinks,
-      {construct_aasa_app_ets_key(app_id), config_set}
-    )
+    validation = AasaAssetlinksApp.validate_aasa_app_config(app_id, config_set)
 
-    {:reply, :ok, state}
+    if validation == :ok do
+      :ets.insert(
+        :aasa_assetlinks,
+        {construct_aasa_app_ets_key(app_id), config_set}
+      )
+
+      {:reply, :ok, state}
+    else
+      {:reply, validation, state}
+    end
   end
 
   def handle_call({:remove_aasa_app, app_id}, _from, state) do
@@ -138,12 +138,18 @@ defmodule AasaAssetlinksServer.InmemStore do
       |> update_relation(config)
       |> update_cert_fingerprints(config)
 
-    :ets.insert(
-      :aasa_assetlinks,
-      {construct_assetlinks_app_ets_key(app_id), config_set}
-    )
+    validation = AasaAssetlinksApp.validate_assetlinks_app_config(app_id, config_set)
 
-    {:reply, :ok, state}
+    if validation == :ok do
+      :ets.insert(
+        :aasa_assetlinks,
+        {construct_assetlinks_app_ets_key(app_id), config_set}
+      )
+
+      {:reply, :ok, state}
+    else
+      {:reply, validation, state}
+    end
   end
 
   def handle_call({:remove_assetlinks_app, app_id}, _from, state) do
