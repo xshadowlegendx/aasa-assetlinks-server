@@ -3,23 +3,20 @@ defmodule AasaAssetlinksServer.Assetlinks do
 
   use Plug.Router
 
+  alias AasaAssetlinksServer.InmemStore
+
   plug :match
   plug :dispatch
 
-  post "app/relations" do
+  put "/" do
+    :ok = InmemStore.set_assetlinks_app(conn.body_params["app_id"], conn.body_params)
+
     send_resp(conn, 204, "")
   end
 
-  delete "app/relations/:idx" do
-    send_resp(conn, 204, "")
-  end
+  delete "/" do
+    :ok = InmemStore.remove_assetlinks_app(conn.body_params["app_id"])
 
-  post "app/fingerprints" do
-    send_resp(conn, 204, "")
-  end
-
-  delete "app/fingerprints/:idx" do
     send_resp(conn, 204, "")
   end
 end
-

@@ -3,27 +3,20 @@ defmodule AasaAssetlinksServer.Aasa do
 
   use Plug.Router
 
+  alias AasaAssetlinksServer.InmemStore
+
   plug :match
   plug :dispatch
 
-  post "/webcredentials" do
+  put "/" do
+    :ok = InmemStore.set_aasa_app(conn.body_params["app_id"], conn.body_params)
+
     send_resp(conn, 204, "")
   end
 
-  delete "/webcredentials/:idx" do
-    send_resp(conn, 204, "")
-  end
+  delete "/" do
+    :ok = InmemStore.remove_aasa_app(conn.body_params["app_id"])
 
-  post "/applinks" do
-    send_resp(conn, 204, "")
-  end
-
-  put "/applinks/:idx" do
-    send_resp(conn, 204, "")
-  end
-
-  delete "/applinks/:idx" do
     send_resp(conn, 204, "")
   end
 end
-
