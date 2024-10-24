@@ -45,12 +45,15 @@ defmodule AasaAssetlinksServer.AasaAssetlinksApp do
     end
   end
 
-  @team_id_regex ~r/^[A-Z0-9]{10}$/
-  @bundle_id_regex ~r/^[a-z0-9]+(\.[a-z0-9]+)*$/
   def validate_assetlinks_app_config(_, config),
     do: {:error, {:wrong_format, "namespace should be string, sha256_cert_fingerprints and relation should be list", {config}}}
 
-  def validate_aasa_app_config(app_id, config) do
+  @team_id_regex ~r/^[A-Z0-9]{10}$/
+  @bundle_id_regex ~r/^[a-z0-9]+(\.[a-z0-9]+)*$/
+  def validate_aasa_app_config(
+    app_id,
+    %{"webcredential" => _, "applink" => applink, "appclip" => _} = config
+  ) do
     splited_app_id_part = String.split(app_id, ".")
 
     valid_team_id? =
@@ -62,12 +65,17 @@ defmodule AasaAssetlinksServer.AasaAssetlinksApp do
       |> Enum.join(".")
       |> String.match?(@bundle_id_regex)
 
+    valid_components? = Enum.all?(applink["components"], &is_map/1)
+
     cond do
       not valid_team_id? ->
         {:error, {:wrong_format, "invalid team id", {app_id, config}}}
 
       not valid_bundle_id? ->
         {:error, {:wrong_format, "invalid bundle id", {app_id, config}}}
+
+      not valid_components? ->
+        {:error, {:wrong_format, "components must be list of map", {app_id, config}}}
 
       true ->
         :ok
