@@ -53,7 +53,7 @@ defmodule AasaAssetlinksServer.InmemStore do
     end
   end
 
-  defp get_app(app, app_id) do
+  def get_app(app, app_id) do
     ets_key =
       case app do
         :aasa -> construct_aasa_app_ets_key(app_id)
