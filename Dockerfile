@@ -3,9 +3,6 @@ FROM elixir@sha256:6b01b34153703e9a4877e33f54d891e30b26fb2832479dfa958a7aec0511b
 
 ENV MIX_ENV=prod
 
-# RUN apk add python3 git build-base make cmake gcc libc-dev curl cargo &&\
-#   ln -sf $(which python3) /usr/bin/python
-
 WORKDIR /opt/app
 
 COPY . .
