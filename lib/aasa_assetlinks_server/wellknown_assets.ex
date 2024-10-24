@@ -73,7 +73,7 @@ defmodule AasaAssetlinksServer.WellknownAssets do
             app_id
           )
           |> Map.update(
-            "sha256_cert_fingerprints",
+            :sha256_cert_fingerprints,
             [],
             fn
               nil -> []
