@@ -1,5 +1,4 @@
-# 1.17-otp-27-alpine
-FROM elixir@sha256:6b01b34153703e9a4877e33f54d891e30b26fb2832479dfa958a7aec0511b0af AS builder
+FROM elixir:1.17-otp-27-alpine AS builder
 
 ENV MIX_ENV=prod
 
