@@ -8,7 +8,7 @@ defmodule AasaAssetlinksServerTest do
 
   describe "aasa" do
     @aasa_app_valid_config %{
-      "app_id" => "teamId.bundleId",
+      "app_id" => "ABCD012BBX.org.acme.app",
       "webcredential" => %{},
       "applink" => %{
         "components" => [%{
