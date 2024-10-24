@@ -1,0 +1,17 @@
+meta {
+  name: remove-aasa-app
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/aasa
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "app_id": "teamId.bundleId"
+  }
+}

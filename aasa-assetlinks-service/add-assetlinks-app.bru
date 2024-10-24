@@ -1,0 +1,24 @@
+meta {
+  name: add-assetlinks-app
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/assetlinks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "app_id": "org.acme.app",
+    "sha256_cert_fingerprints": [
+      "25:0D:9B:52:B1:78:23:BC:49:43:E0:A4:B0:FB:1D:C0:40:1D:79:F4:A6:C8:97:E8:FE:F0:70:00:F4:59:7F:0E"
+    ],
+    "relation": [
+      "delegate_permission/common.get_login_creds",
+      "delegate_permission/common.handle_all_urls"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+meta {
+  name: remove-assetlinks-app
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/assetlinks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "app_id": "org.acme.app"
+  }
+}

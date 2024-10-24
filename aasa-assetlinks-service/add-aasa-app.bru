@@ -1,0 +1,25 @@
+meta {
+  name: add-aasa-app
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/aasa
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "app_id": "teamId.bundleId",
+    "webcredential": {},
+    "applink": {
+      "components": [{
+        "#": "*",
+        "?": "*",
+        "/": "*"
+      }]
+    }
+  }
+}
