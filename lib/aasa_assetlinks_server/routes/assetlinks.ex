@@ -17,6 +17,11 @@ defmodule AasaAssetlinksServer.Assetlinks do
         conn
         |> put_resp_content_type("application/json")
         |> send_resp(400, :json.encode(%{code: nil, message: message}))
+
+      {:error, :store_not_ready} ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(422, :json.encode(%{code: nil, message: "memory store not ready"}))
     end
   end
 
