@@ -1,0 +1,24 @@
+
+services:
+  garage:
+    image: dxflrs/garage:v1.0.0
+    restart: unless-stopped
+    ports:
+      - 3900:3900
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro,z
+
+  aasa_assetlinks_service_0: &aasa_assetlinks_service
+    restart: unless-stopped
+    build:
+      context: .
+    environment: &aasa_assetlinks_service_env
+      NODE_HOST: aasa_assetlinks_service_0
+      RELEASE_DISTRIBUTION: sname
+      S3_REGION: garage
+
+  aasa_assetlinks_service_1:
+    <<: *aasa_assetlinks_service
+    environment:
+      <<: *aasa_assetlinks_service_env
+      NODE_HOST: aasa_assetlinks_service_1

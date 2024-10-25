@@ -1,0 +1,22 @@
+
+db_engine = "lmdb"
+data_dir = "/tmp/data"
+metadata_dir = "/tmp/meta"
+metadata_auto_snapshot_interval = "8h"
+
+compression_level = 2
+replication_factor = 1
+
+rpc_bind_addr = "[::]:3901"
+rpc_secret = "cdb995f5325c0458f8f41c4216d317f77efaf12cd117f8b8d9bbd3e7deef0f04"
+rpc_public_addr = "localhost:3901"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = "s3.garage.127.0.0.1.sslip.io"
+
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = "web.garage.127.0.0.1.sslip.io"
+index = "index.html"
