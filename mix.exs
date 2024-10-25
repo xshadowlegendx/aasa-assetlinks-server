@@ -27,6 +27,7 @@ defmodule AasaAssetlinksServer.MixProject do
       {:plug, "~> 1.16"},
       {:bandit, "~> 1.0"},
       {:finch, "~> 0.19.0"},
+      {:fast_xml, "~> 1.1"},
       {:libcluster, "~> 3.4"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"}
