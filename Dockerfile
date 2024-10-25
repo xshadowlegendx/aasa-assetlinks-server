@@ -4,6 +4,8 @@ ENV MIX_ENV=prod
 
 WORKDIR /opt/app
 
+RUN apk add --virtual .build-deps build-base expat-dev
+
 COPY . .
 
 RUN mix local.hex --force &&\
@@ -24,7 +26,7 @@ ENV LANG=en_US.UTF-8\
   SHELL=/bin/bash
 WORKDIR $HOME
 
-RUN apk --no-cache add openssl bash libstdc++ &&\
+RUN apk --no-cache add expat libstdc++ libncursesw &&\
   addgroup genx &&\
   adduser -D -G genx xuser &&\
   mkdir -p $HOME/uploads $HOME/logs
