@@ -12,13 +12,17 @@ services:
     restart: unless-stopped
     build:
       context: .
+    ports:
+      - 4000:4000
     environment: &aasa_assetlinks_service_env
       NODE_HOST: aasa_assetlinks_service_0
+      CLUSTERING_STRATEGY: gossip
       RELEASE_DISTRIBUTION: sname
       S3_REGION: garage
 
   aasa_assetlinks_service_1:
     <<: *aasa_assetlinks_service
+    ports: []
     environment:
       <<: *aasa_assetlinks_service_env
       NODE_HOST: aasa_assetlinks_service_1
