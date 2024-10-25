@@ -9,7 +9,7 @@ defmodule AasaAssetlinksServer.AwsHttpClient do
     case Finch.request(req, FinchHttpClient) do
       {:ok, %Finch.Response{} = resp} ->
         resp_body =
-          if method == :get do
+          if method == :get or method == :head do
             resp.body
           else
             parse_xml_response_body(resp.body)
@@ -25,7 +25,7 @@ defmodule AasaAssetlinksServer.AwsHttpClient do
         }
 
       {:error, reason} ->
-        {:error, %{reason: reason}}
+        {:error, reason}
     end
   end
 
