@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aasa-assetlinks-server
+  labels:
+    app.kubernetes.io/name: aasa-assetlinks-server
+spec:
+  selector:
+    matchLabels:
+      app: aasa-assetlinks-server
+  template:
+    metadata:
+      labels:
+        app: aasa-assetlinks-server
+    spec:
+      containers:
+      - name: aasa-assetlinks-server
+        image: ghcr.io/xshadowlegendx/aasa_assetlinks_server:0.1.0@sha256:79ae7eaa6464c39dbd1465c2a6b1c5e9a09911ac369a24ab64dc72a2c5b53cfe
+        resources:
+          limits:
+            cpu: 384m
+            memory: 256Mi
+        ports:
+        - name: http
+          containerPort: 4000
+        envFrom:
+        - secretRef:
+            name: aasa-assetlinks-server
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aasa-assetlinks-server
+  labels:
+    app.kubernetes.io/name: aasa-assetlinks-server
+spec:
+  selector:
+    app.kubernetes.io/name: aasa-assetlinks-server
+  ports:
+  - port: 80
+    targetPort: http
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aasa-assetlinks-server
+  labels:
+    app.kubernetes.io/name: aasa-assetlinks-server
+data: {}
