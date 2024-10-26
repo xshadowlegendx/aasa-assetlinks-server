@@ -50,10 +50,13 @@ defmodule AasaAssetlinksServer.InmemStore do
   defp s3_bucket_name(),
     do: System.get_env("S3_BUCKET_NAME")
 
+  defp s3_ets_backup_file_path(),
+    do: "#{System.get_env("S3_BUCKET_BACKUP_PATH", "backups/aasa-assetlinks")}/ets.tab2file"
+
   defp restore_ets_table_from_s3() do
     bucket = s3_bucket_name()
 
-    with {:ok, :done} <- ExAws.S3.download_file(bucket, "ets.tab2file", @ets_tab2file_path) |> ExAws.request(),
+    with {:ok, :done} <- ExAws.S3.download_file(bucket, s3_ets_backup_file_path(), @ets_tab2file_path) |> ExAws.request(),
          {:ok, _} <- :ets.file2tab(:binary.bin_to_list(@ets_tab2file_path)) do
       Logger.info("ets table restored from s3")
 
@@ -227,7 +230,7 @@ defmodule AasaAssetlinksServer.InmemStore do
     store_data_hash = :crypto.hash(:sha3_256, store_data)
 
     if store_data_hash != state.tab2file_hash do
-      case ExAws.S3.put_object(s3_bucket_name(), "ets.tab2file", store_data) |> ExAws.request() do
+      case ExAws.S3.put_object(s3_bucket_name(), s3_ets_backup_file_path(), store_data) |> ExAws.request() do
         {:ok, %{status_code: 200}} ->
           Logger.info("data saved on s3 bucket - s3:#{s3_bucket_name()}/ets.tab2file")
 

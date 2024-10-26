@@ -27,6 +27,7 @@ secretGenerator:
   - S3_HOST=s3.example.com
   - S3_URL_SCHEME=https
   - S3_BUCKET_NAME=aasa-assetlinks
+  - S3_BUCKET_BACKUP_PATH=backups/aasa-assetlinks
   files:
   - S3_ACCESS_KEY_ID=./.secrets/S3_ACCESS_KEY_ID
   - S3_SECRET_ACCESS_KEY=./.secrets/S3_SECRET_ACCESS_KEY
