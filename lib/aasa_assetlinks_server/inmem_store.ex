@@ -124,14 +124,14 @@ defmodule AasaAssetlinksServer.InmemStore do
 
   defp ensure_aasa_app({_, app}), do: app
 
-  defp update_applink(app, %{"applink" => %{"components" => [_|_] = components}}),
-    do: %{app | "applink" => %{"components" => components}}
+  defp update_applink(app, %{"applink" => applink}),
+    do: %{app | "applink" => applink}
 
   defp update_applink(app, _),
     do: %{app | "applink" => nil}
 
-  defp update_aasa_webcredential(app, %{"webcredential" => %{}}),
-    do: %{app | "webcredential" => %{}}
+  defp update_aasa_webcredential(app, %{"webcredential" => webcredential}),
+    do: %{app | "webcredential" => webcredential}
 
   defp update_aasa_webcredential(app, _),
     do: %{app | "webcredential" => nil}
@@ -143,13 +143,13 @@ defmodule AasaAssetlinksServer.InmemStore do
   defp set_namespace(app, app_id),
     do: %{app | "namespace" => AasaAssetlinksApp.derive_assetlinks_namespace(app_id)}
 
-  defp update_relation(app, %{"relation" => [_|_] = relations}),
+  defp update_relation(app, %{"relation" => relations}),
     do: %{app | "relation" => relations}
 
   defp update_relation(app, _),
     do: %{app | "relation" => nil}
 
-  defp update_cert_fingerprints(%{"namespace" => "android_app"} = app, %{"sha256_cert_fingerprints" => [_|_] = fingerprints}),
+  defp update_cert_fingerprints(%{"namespace" => "android_app"} = app, %{"sha256_cert_fingerprints" => fingerprints}),
     do: %{app | "sha256_cert_fingerprints" => fingerprints}
 
   defp update_cert_fingerprints(app, _),
