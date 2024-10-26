@@ -49,7 +49,7 @@ defmodule AasaAssetlinksServer.AasaAssetlinksApp do
     do: {:error, {:wrong_format, "namespace should be string, sha256_cert_fingerprints and relation should be list", {config}}}
 
   @team_id_regex ~r/^[A-Z0-9]{10}$/
-  @bundle_id_regex ~r/^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$/
+  @bundle_id_regex ~r/^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/
   def validate_aasa_app_config(
     app_id,
     %{"webcredential" => _, "applink" => applink, "appclip" => _} = config
