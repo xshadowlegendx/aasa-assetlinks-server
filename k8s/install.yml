@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: aasa-assetlinks-server
-        image: ghcr.io/xshadowlegendx/aasa_assetlinks_server:0.1.0@sha256:79ae7eaa6464c39dbd1465c2a6b1c5e9a09911ac369a24ab64dc72a2c5b53cfe
+        image: ghcr.io/xshadowlegendx/aasa-assetlinks-server:latest
         resources:
           limits:
             cpu: 384m
