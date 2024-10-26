@@ -54,6 +54,50 @@ defmodule AasaAssetlinksServerTest do
       assert conn.status == 204
       assert is_nil(app)
     end
+
+    test "able to unset applink components", _context do
+      :put
+      |> conn("/aasa", @aasa_app_valid_config)
+      |> AasaAssetlinksServer.Router.call([])
+
+      initial_app = AasaAssetlinksServer.InmemStore.get_app(:aasa, @aasa_app_valid_config["app_id"])
+
+      conn =
+        :put
+        |> conn("/aasa", %{@aasa_app_valid_config | "applink" => %{}})
+        |> AasaAssetlinksServer.Router.call([])
+
+      after_app = AasaAssetlinksServer.InmemStore.get_app(:aasa, @aasa_app_valid_config["app_id"])
+
+      assert conn.status == 204
+      assert after_app |> elem(1) |> Map.get("applink") == %{}
+      assert initial_app |> elem(1) |> Map.get("applink") != after_app |> elem(1) |> Map.get("applink")
+    end
+
+    test "invalid app_id format", _context do
+      conn =
+        :put
+        |> conn("/aasa", %{@aasa_app_valid_config | "app_id" => "ABC.org.acme.app"})
+        |> AasaAssetlinksServer.Router.call([])
+
+      assert conn.status == 400
+    end
+
+    test "invalid applink format", _context do
+      conn =
+        :put
+        |> conn("/aasa", %{@aasa_app_valid_config | "applink" => %{"components" => %{}}})
+        |> AasaAssetlinksServer.Router.call([])
+
+      assert conn.status == 400
+
+      conn =
+        :put
+        |> conn("/aasa", %{@aasa_app_valid_config | "applink" => []})
+        |> AasaAssetlinksServer.Router.call([])
+
+      assert conn.status == 400
+    end
   end
 
   describe "assetlinks" do
@@ -103,6 +147,24 @@ defmodule AasaAssetlinksServerTest do
 
       assert conn.status == 204
       assert is_nil(app)
+    end
+
+    test "test invalid sha256 cert fingerprints", _context do
+      conn =
+        :put
+        |> conn("/assetlinks", %{@assetlinks_app_valid_config | "sha256_cert_fingerprints" => ["abc:df"]})
+        |> AasaAssetlinksServer.Router.call([])
+
+      assert conn.status == 400
+    end
+
+    test "test invalid relation", _context do
+      conn =
+        :put
+        |> conn("/assetlinks", %{@assetlinks_app_valid_config | "relation" => ["abc:df"]})
+        |> AasaAssetlinksServer.Router.call([])
+
+      assert conn.status == 400
     end
   end
 
