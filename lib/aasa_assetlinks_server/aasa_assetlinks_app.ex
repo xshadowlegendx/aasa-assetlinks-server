@@ -65,7 +65,8 @@ defmodule AasaAssetlinksServer.AasaAssetlinksApp do
       |> Enum.join(".")
       |> String.match?(@bundle_id_regex)
 
-    valid_components? = Enum.all?(applink["components"], &is_map/1)
+    valid_components? =
+      is_map(applink) and (is_nil(applink["components"]) or Enum.all?(applink["components"], &is_map/1))
 
     cond do
       not valid_team_id? ->
