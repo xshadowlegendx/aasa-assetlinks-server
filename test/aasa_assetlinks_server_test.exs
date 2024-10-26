@@ -81,6 +81,13 @@ defmodule AasaAssetlinksServerTest do
         |> AasaAssetlinksServer.Router.call([])
 
       assert conn.status == 400
+
+      conn =
+        :put
+        |> conn("/aasa", %{@aasa_app_valid_config | "app_id" => "ABCD012BBX.org.12AB._+"})
+        |> AasaAssetlinksServer.Router.call([])
+
+      assert conn.status == 400
     end
 
     test "invalid applink format", _context do
