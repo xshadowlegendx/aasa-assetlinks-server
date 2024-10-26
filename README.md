@@ -42,3 +42,22 @@ kubectl apply -k .
 # data will not be persist
 docker container run --rm -it -p 4000:4000 shadowlegend/aasa-assetlinks-server:latest
 ```
+
+## Usage
+
+### Using Bruno
+
+- import the collection at `aasa-assetlinks-service/` to see list of apis
+- use the `dev` environment at the top right corner if reachable at `localhost` or change the config accordingly
+
+### Using cURL
+
+```bash
+jo app_id=ABCD012BBX.org.acme.app webcredential={} applink=$(jo components='[]') | curl -XPUT localhost:4000/aasa -v -H 'content-type: application/json' --data-binary @-
+
+jo app_id=org.acme.app sha256_cert_fingerprints='[]' relation=$(jo -a "delegate_permission/common.get_login_creds") | curl -XPUT localhost:4000/assetlinks -v -H 'content-type: application/json' --data-binary @-
+
+curl localhost:4000/.well-known/assetlinks.json -v | jq
+
+curl localhost:4000/.well-known/apple-app-site-association -v | jq
+```
