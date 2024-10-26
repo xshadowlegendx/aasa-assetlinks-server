@@ -1,21 +1,40 @@
-# AasaAssetlinksServer
+# Simple Server for Apple App Site Assocation and Assetlinks.json
 
-**TODO: Add description**
+<img src="https://coveralls.io/repos/github/xshadowlegendx/aasa-assetlinks-server/badge.svg?branch=main"/> <img src="https://github.com/xshadowlegendx/aasa-assetlinks-server/actions/workflows/build.yml/badge.svg"/>
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `aasa_assetlinks_server` to your list of dependencies in `mix.exs`:
+### Kubernetes
 
-```elixir
-def deps do
-  [
-    {:aasa_assetlinks_server, "~> 0.1.0"}
-  ]
-end
+```bash
+# with kustomize
+cat <<EOF > kustomization.yml
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- https://raw.githubusercontent.com/xshadowlegendx/aasa-assetlinks-server/refs/heads/main/k8s/install.yml
+
+secretGenerator:
+- name: aasa-assetlinks-server
+  behavior: merge
+  literals:
+  - S3_PORT='443'
+  - S3_REGION=garage
+  - S3_HOST=s3.example.com
+  - S3_URL_SCHEME=https
+  - S3_BUCKET_NAME=aasa-assetlinks
+  files:
+  - S3_ACCESS_KEY_ID=./.secrets/S3_ACCESS_KEY_ID
+  - S3_SECRET_ACCESS_KEY=./.secrets/S3_SECRET_ACCESS_KEY
+EOF
+
+kubectl apply -k .
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/aasa_assetlinks_server>.
+### Docker
 
+```bash
+docker container run --rm -it -p 4000:4000 shadowlegend/aasa-assetlinks-server:latest
+```
