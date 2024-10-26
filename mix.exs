@@ -7,7 +7,15 @@ defmodule AasaAssetlinksServer.MixProject do
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.cobertura": :test
+      ]
     ]
   end
 
@@ -30,7 +38,8 @@ defmodule AasaAssetlinksServer.MixProject do
       {:fast_xml, "~> 1.1"},
       {:libcluster, "~> 3.4"},
       {:ex_aws, "~> 2.1"},
-      {:ex_aws_s3, "~> 2.0"}
+      {:ex_aws_s3, "~> 2.0"},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 end

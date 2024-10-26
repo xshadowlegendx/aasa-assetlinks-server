@@ -5,6 +5,8 @@ on:
     branches:
       - main
     paths-ignore:
+      - k8s/
+      - aasa-assetlink-service/
       - .gitignore
       - .env.example
       - README.md
@@ -21,6 +23,9 @@ permissions:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,8 +35,7 @@ jobs:
           elixir-version: '1.17.3'
 
       - run: mix deps.get
-
-      - run: mix test
+      - run: mix coveralls.github
 
   build-push-docker-image:
     runs-on: ubuntu-latest
