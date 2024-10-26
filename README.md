@@ -8,6 +8,8 @@
 
 ```bash
 # with kustomize
+# ensure .secrets/S3_ACCESS_KEY_ID and .secrets/S3_SECRET_ACCESS_KEY
+# exists before running below commands
 cat <<EOF > kustomization.yml
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -36,5 +38,7 @@ kubectl apply -k .
 ### Docker
 
 ```bash
+# if no s3 credential and bucket configured
+# data will not be persist
 docker container run --rm -it -p 4000:4000 shadowlegend/aasa-assetlinks-server:latest
 ```
