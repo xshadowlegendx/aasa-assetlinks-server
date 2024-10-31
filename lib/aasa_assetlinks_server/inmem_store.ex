@@ -11,19 +11,30 @@ defmodule AasaAssetlinksServer.InmemStore do
   @upload_ets_table_interval_8_minute_as_seconds 8 * 60 * 1000
 
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, nil, name: {:global, __MODULE__})
+    case GenServer.whereis({:global, __MODULE__}) do
+      nil -> GenServer.start_link(__MODULE__, nil, name: {:global, __MODULE__})
+
+      _ -> :ignore
+    end
   end
 
   def init(_opts) do
     {:ok, %{ready?: false, tab2file_hash: nil}, {:continue, nil}}
   end
 
-  def handle_continue(nil, _state) do
+  def handle_continue(nil, state) do
     Logger.info("preparing inmemory store")
+
+    # simple trick to avoid downloading from s3 bucket
+    # initially if starting multiple replicas and
+    # clustering take some time to connect
+    Process.sleep(4000)
 
     if System.get_env("S3_BUCKET_NAME") in ["", nil] do
       Logger.warning("no s3 bucket configured, data will be gone if restarted or when cluster failed")
     else
+      Logger.info("s3 configured, try finding and restoring ets table from it")
+
       restore_ets_table_from_s3()
 
       Process.send_after(self(), :upload_ets_table_to_s3, @upload_ets_table_interval_8_minute_as_seconds)
@@ -33,18 +44,17 @@ defmodule AasaAssetlinksServer.InmemStore do
       :ets.new(:aasa_assetlinks, [:set, :public, :named_table])
     end
 
+    :ok = :ets.tab2file(:aasa_assetlinks, :binary.bin_to_list(@ets_tab2file_path))
+
+    {:ok, store_data} = File.read(@ets_tab2file_path)
+
+    tab2file_hash = :crypto.hash(:sha3_256, store_data)
+
+    :ok = send_ets_sync_data_to_all_node(store_data)
+
     Logger.info("inmemory store ready")
 
-    tab2file_hash =
-      case File.read(@ets_tab2file_path) do
-        {:ok, store_data} ->
-          :crypto.hash(:sha3_256, store_data)
-
-        {:error, reason} ->
-          Logger.warning("fail to read #{@ets_tab2file_path} - #{reason}")
-      end
-
-    {:noreply, %{ready?: true, tab2file_hash: tab2file_hash}}
+    {:noreply, %{state | ready?: true, tab2file_hash: tab2file_hash}}
   end
 
   defp s3_bucket_name(),
@@ -178,6 +188,8 @@ defmodule AasaAssetlinksServer.InmemStore do
         {construct_aasa_app_ets_key(app_id), config_set}
       )
 
+      :ok = send_ets_sync_data_to_all_node()
+
       {:reply, :ok, state}
     else
       {:reply, validation, state}
@@ -186,6 +198,8 @@ defmodule AasaAssetlinksServer.InmemStore do
 
   def handle_call({:remove_aasa_app, app_id}, _from, state) do
     :ets.delete(:aasa_assetlinks, construct_aasa_app_ets_key(app_id))
+
+    :ok = send_ets_sync_data_to_all_node()
 
     {:reply, :ok, state}
   end
@@ -208,6 +222,8 @@ defmodule AasaAssetlinksServer.InmemStore do
         {construct_assetlinks_app_ets_key(app_id), config_set}
       )
 
+      :ok = send_ets_sync_data_to_all_node()
+
       {:reply, :ok, state}
     else
       {:reply, validation, state}
@@ -216,6 +232,8 @@ defmodule AasaAssetlinksServer.InmemStore do
 
   def handle_call({:remove_assetlinks_app, app_id}, _from, state) do
     :ets.delete(:aasa_assetlinks, construct_assetlinks_app_ets_key(app_id))
+
+    :ok = send_ets_sync_data_to_all_node()
 
     {:reply, :ok, state}
   end
@@ -242,6 +260,24 @@ defmodule AasaAssetlinksServer.InmemStore do
     {:noreply, %{state | tab2file_hash: store_data_hash}}
   end
 
+  defp send_ets_sync_data_to_all_node() do
+    :ok = :ets.tab2file(:aasa_assetlinks, :binary.bin_to_list(@ets_tab2file_path))
+
+    {:ok, store_data} = File.read(@ets_tab2file_path)
+
+    Enum.each(
+      Node.list(),
+      &Kernel.send({AasaAssetlinksServer.NodeMessenger, &1}, {:ets_sync_data, store_data})
+    )
+  end
+
+  defp send_ets_sync_data_to_all_node(store_data) do
+    Enum.each(
+      Node.list(),
+      &Kernel.send({AasaAssetlinksServer.NodeMessenger, &1}, {:ets_sync_data, store_data})
+    )
+  end
+
   def set_aasa_app(app_id, config) do
     GenServer.call(:global.whereis_name(__MODULE__), {:set_aasa_app, {app_id, config}})
   end
@@ -256,6 +292,16 @@ defmodule AasaAssetlinksServer.InmemStore do
 
   def remove_assetlinks_app(app_id) do
     GenServer.call(:global.whereis_name(__MODULE__), {:remove_assetlinks_app, app_id})
+  end
+
+  def sync_ets_data(store_data) do
+    :ok = File.write(@ets_tab2file_path, store_data, [:write])
+
+    if :ets.info(:aasa_assetlinks) != :undefined do
+      :ets.delete(:aasa_assetlinks)
+    end
+
+    :ets.file2tab(:binary.bin_to_list(@ets_tab2file_path))
   end
 
   def get_aasa_assetlinks() do

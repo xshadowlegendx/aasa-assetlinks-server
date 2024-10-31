@@ -14,11 +14,17 @@ services:
       context: .
     ports:
       - 4000:4000
+    env_file:
+      - .env
     environment: &aasa_assetlinks_service_env
       NODE_HOST: aasa_assetlinks_service_0
       CLUSTERING_STRATEGY: gossip
       RELEASE_DISTRIBUTION: sname
       S3_REGION: garage
+      S3_PORT: 3900
+      S3_HOST: garage
+      S3_URL_SCHEME: http
+      S3_BUCKET_NAME: aasa-assetlinks
 
   aasa_assetlinks_service_1:
     <<: *aasa_assetlinks_service
@@ -26,3 +32,10 @@ services:
     environment:
       <<: *aasa_assetlinks_service_env
       NODE_HOST: aasa_assetlinks_service_1
+
+  aasa_assetlinks_service_2:
+    <<: *aasa_assetlinks_service
+    ports: []
+    environment:
+      <<: *aasa_assetlinks_service_env
+      NODE_HOST: aasa_assetlinks_service_2

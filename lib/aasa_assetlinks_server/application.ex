@@ -17,6 +17,7 @@ defmodule AasaAssetlinksServer.Application do
         ]
       },
       AasaAssetlinksServer.InmemStore,
+      AasaAssetlinksServer.NodeMessenger,
       {Bandit, plug: AasaAssetlinksServer.Router, scheme: :http, port: 4000}
     ]
 
