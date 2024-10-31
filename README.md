@@ -8,8 +8,8 @@
 
 ```bash
 # with kustomize
-# ensure .secrets/S3_ACCESS_KEY_ID and .secrets/S3_SECRET_ACCESS_KEY
-# exists before running below commands
+# ensure .secrets/S3_ACCESS_KEY_ID, .secrets/S3_SECRET_ACCESS_KEY
+# and .secrets/RELEASE_COOKIE exists before running below commands
 cat <<EOF > kustomization.yml
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -29,6 +29,7 @@ secretGenerator:
   - S3_BUCKET_NAME=aasa-assetlinks
   - S3_BUCKET_BACKUP_PATH=backups/aasa-assetlinks
   files:
+  - RELEASE_COOKIE=./.secrets/RELEASE_COOKIE
   - S3_ACCESS_KEY_ID=./.secrets/S3_ACCESS_KEY_ID
   - S3_SECRET_ACCESS_KEY=./.secrets/S3_SECRET_ACCESS_KEY
 EOF
