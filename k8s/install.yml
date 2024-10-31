@@ -8,11 +8,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: aasa-assetlinks-server
+      app.kubernetes.io/name: aasa-assetlinks-server
   template:
     metadata:
       labels:
-        app: aasa-assetlinks-server
+        app.kubernetes.io/name: aasa-assetlinks-server
     spec:
       containers:
       - name: aasa-assetlinks-server
