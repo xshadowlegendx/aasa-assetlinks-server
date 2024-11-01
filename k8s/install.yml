@@ -63,6 +63,7 @@ metadata:
   labels:
     app.kubernetes.io/name: aasa-assetlinks-server
 spec:
+  clusterIP: None
   selector:
     app.kubernetes.io/name: aasa-assetlinks-server
 
